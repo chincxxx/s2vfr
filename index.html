@@ -16,26 +16,46 @@
     <script src="jsPsych-6.3.1/plugin-virtual-chinrest.js"></script>
     <script src="https://brain2ai.github.io/jsPsychSheet/jspsychsheet.js"></script> 
     <link rel="stylesheet" href="https://brain2ai.github.io/jsPsychSheet/jspsychsheet.css">
+    <meta http-equiv='content-Type' content='text/html; charset=UTF-8'/>
 
     <style> 
       #topText {
             position: fixed;
-            top: 0;
+            top: 10%;
             left: 50%;
             transform: translateX(-50%);
             padding: 10px;
             z-index: 1000; 
-            font-size: 24px/* Ensures it is on top of other elements */
+            font-size: 24px
         }
       #bottomText {
             position: fixed;
-            bottom: 0;
+            bottom: 10%;
             left: 50%;
             transform: translateX(-50%);
             padding: 10px;
             z-index: 1000;
-            font-size: 24px/* Ensures it is on top of other elements */
+            font-size: 24px
         }
+        #topCross {
+            position: fixed;
+            top: 25%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px;
+            z-index: 1000; 
+            font-size: 24px
+        }
+        #bottomCross {
+          position: fixed;
+            bottom: 25%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px;
+            z-index: 1000; 
+            font-size: 24px
+        }
+
       .blue-line{
         color:blue
       }
@@ -97,7 +117,7 @@
     var C11= ["c11_1", "c11_2", "c11_3", "c11_4"]
     var C12= ["c12_1", "c12_2", "c12_3", "c12_4"]
 
-    var buffer_list = ["这是一个buffer1","这又是一个buffer"]
+    var buffer_list = ["a buffer1","a buffer2"]
     var practice_list = ["你好c", "这里c", "可能b","无语c","好吃b","天啊c"]
     var experiment_list= [...A1, ...A7]
     console.log(buffer_list)
@@ -115,6 +135,8 @@
 
 
     //INPUT from participants 
+    //var idnum = jsPsych.data.getURLVariable('idnum')
+    //var soa = parseInt(jsPsych.data.getURLVariable('soa'))
     var idnum = jsPsych.data.getURLVariable('idnum')
     var soa = parseInt(jsPsych.data.getURLVariable('soa'))
     
@@ -125,15 +147,16 @@
     var key_assignment, key_text
     if (idnum % 2 === 0) {
       key_assignment = "posRight";
-      key_text = `
+      key_text = 
+      `
       <p>In this part of the experiment, we are looking at how people make simple but quick judgments. 
       For each trial, you will see a brief presentation of a traditional Chinese compound word.</p>
       <p class="blue-line"><b>Your job is to judge the valence of the word (the emotion it expresses).</b></p>
       <p><b>Each word will remain on the screen for a brief time. 
       When prompted, you should respond by indicating whether you think the 
       word you saw expresses positive or negative.</b></p>
-      <p class="red-line"><b>If it's a <u>positive word</u>, press the 'A' key.</b></p>
-      <p class="red-line"><b>If it's a <u>negative word</u>, press the 'L' key.</b></p>
+      <p class="red-line"><b>If it's a <u>positive word</u>, press the 'L' key.</b></p>
+      <p class="red-line"><b>If it's a <u>negative word</u>, press the 'A' key.</b></p>
       <p>When the study is fully loaded, the button below will activate. 
       Click it to indicate you have read these instructions, and are ready 
       to continue to the second page of instructions. 
@@ -149,8 +172,8 @@
       <p><b>Each word will remain on the screen for a brief time. 
       When prompted, you should respond by indicating whether you think the 
       word you saw expresses positive or negative.</b></p>
-      <p class="red-line"><b>If it's a <u>negative word</u>, press the 'A' key.</b></p>
-      <p class="red-line"><b>If it's a <u>positive word</u>, press the 'L' key.</b></p>
+      <p class="red-line"><b>If it's a <u>negative word</u>, press the 'L' key.</b></p>
+      <p class="red-line"><b>If it's a <u>positive word</u>, press the 'A' key.</b></p>
       <p>When the study is fully loaded, the button below will activate. 
       Click it to indicate you have read these instructions, and are ready 
       to continue to the second page of instructions. 
@@ -159,16 +182,37 @@
       and are definitely sure that you are ready!</i></u></b></p>`
     }
 
-    //var positions_pre = ["<p style='vertical-align:384px'>", "<p style='vertical-align:-384px'>"] 
-    var positions_pre = ["topText", "bottomText"]
+    var target_positions_pre = ["topText", "bottomText"]
     var experiment_positions_pre, buffer_positions_pre, practice_positions_pre
     if (experiment_list.length % 2 === 0) {
-      experiment_positions_pre = jsPsych.randomization.repeat(positions_pre, experiment_list.length/positions_pre.length);} 
+      experiment_positions_pre = jsPsych.randomization.repeat(target_positions_pre, experiment_list.length/target_positions_pre.length);} 
     else {
-      experiment_positions_pre = [...jsPsych.randomization.repeat(positions_pre, (experiment_list.length - 1)/positions_pre.length)]
+      experiment_positions_pre = [...jsPsych.randomization.repeat(target_positions_pre, (experiment_list.length - 1)/target_positions_pre.length)]
     }
-    buffer_positions_pre = jsPsych.randomization.repeat(positions_pre, 1)
-    practice_positions_pre = jsPsych.randomization.repeat(positions_pre, 3)
+    buffer_positions_pre = jsPsych.randomization.repeat(target_positions_pre, 1)
+    practice_positions_pre = jsPsych.randomization.repeat(target_positions_pre, 3)
+    var exp_cross_positions_pre, prac_cross_positions_pre, buff_cross_positions_pre
+    var exp_cross_positions_pre = experiment_positions_pre.map(item=>{
+      if (item === "topText"){
+        return "topCross";
+      } else if (item === "bottomText"){
+        return "bottomCross";
+      }
+    })
+    var buff_cross_positions_pre = buffer_positions_pre.map(item=>{
+      if (item === "topText"){
+        return "topCross";
+      } else if (item === "bottomText"){
+        return "bottomCross";
+      }
+    })
+    var prac_cross_positions_pre = practice_positions_pre.map(item=>{
+      if (item === "topText"){
+        return "topCross";
+      } else if (item === "bottomText"){
+        return "bottomCross";
+      }
+    })
 console.log(experiment_list)
 console.log(practice_positions_pre)
 console.log(buffer_positions_pre)
@@ -181,13 +225,13 @@ var exp_stim_pos = []
 var prac_stim_pos = []
 var buff_stim_pos = []
 for (let k = 0; k < buffer_list.length; k++) {
-      buff_stim_pos.push({ current_positions_pre: buffer_positions_pre[k], current_stimuli: buffer_list[k] });
+      buff_stim_pos.push({ current_positions_pre: buffer_positions_pre[k], current_stimuli: buffer_list[k], current_cross_positions_pre:buff_cross_positions_pre[k]});
     }
 for (let i = 0; i < experiment_list.length; i++) {
-      exp_stim_pos.push({ current_positions_pre: experiment_positions_pre[i], current_stimuli: experiment_list[i] });
+      exp_stim_pos.push({ current_positions_pre: experiment_positions_pre[i], current_stimuli: experiment_list[i] , current_cross_positions_pre:exp_cross_positions_pre[i]});
 }
 for (let j = 0; j < practice_list.length; j++) {
-      prac_stim_pos.push({ current_positions_pre: practice_positions_pre[j], current_stimuli: practice_list[j] });
+      prac_stim_pos.push({ current_positions_pre: practice_positions_pre[j], current_stimuli: practice_list[j] , current_cross_positions_pre:prac_cross_positions_pre[j]});
 }
 
 console.log(buff_stim_pos)
@@ -216,12 +260,13 @@ console.log(buff_stim_pos)
     } 
     timeline.push(fullscreen_on);
 
-    var instruction_2 = { //key assignment is different 
+    var instruction_2 = {
       type: jsPsychHtmlButtonResponse,
       data: { screen: "instruction_2" },
 			stimulus: key_text,
 			choices: ["Click to continue"]
 		};
+    timeline.push(instruction_2)
 
     var instruction_3 = {
       type: jsPsychHtmlButtonResponse,
@@ -262,12 +307,12 @@ console.log(buff_stim_pos)
     //var cross_positions
     var trial_types
     
-    //"<p style='vertical-align:"+current_positions_pre+"'> +++ </p>"
+
     var position_fixation = {
       type: jsPsychHtmlKeyboardResponse,
       stimulus: function(){
-        current_positions_pre = jsPsych.timelineVariable("current_positions_pre")
-        var full_pos = '<div id='+current_positions_pre+'> +++ </div>';
+        current_cross_positions_pre = jsPsych.timelineVariable("current_cross_positions_pre")
+        var full_pos = '<div id='+current_cross_positions_pre+'> +++ </div>';
         //`<div id="topText">+++</div>`
         console.log(full_pos)
         return (full_pos)
@@ -278,7 +323,7 @@ console.log(buff_stim_pos)
         data.screen = "position_fixation"
         data.blocknum = blocknum 
         data.trialnum = trialnum
-        data.current_positions_pre = current_positions_pre
+        data.current_cross_positions_pre = current_cross_positions_pre
       }
     }
     var blank_soa = {
@@ -316,7 +361,7 @@ console.log(buff_stim_pos)
           trial_types = "buffer_trial"
         }
         return (full_stim)
-    }, /////////////////////////3000 ms
+    }, 
       choices: ["a", "l"],
       trial_duration: 3000,
       on_finish: function(data){
