@@ -124,7 +124,7 @@
     var practice_pos_list = ["快樂_c", "喜悅_c", "可口_b",]
     var practice_neg_list = ["傷心_b","惱人_c","生氣_c"]
     var practice_list = [...practice_neg_list, ...practice_pos_list]
-    var experiment_list= [...A1, ...A7]
+    var experiment_list= [...A1, ...A7] ///needs revise 
 
     
     console.log(buffer_list)
@@ -278,7 +278,7 @@ console.log(buff_stim_pos)
           <p>Hello, we are interested in xxxxxxxx (remember to fill in text)! 
           When you are ready to start the experiment please press start to begin. 
           You can continue in 3 seconds.</p>`,
-			choices: ["Click to continue"],
+			choices: ["繼續"],
       on_load: () => {
         document.querySelector('button').disabled = true;
         setTimeout(() => { document.querySelector('button').disabled = false}, 3000)
@@ -297,7 +297,7 @@ console.log(buff_stim_pos)
       type: jsPsychHtmlButtonResponse,
       data: { screen: "instruction_2" },
 			stimulus: key_text,
-			choices: ["Click to continue"]
+			choices: ["繼續"]
 		};
     timeline.push(instruction_2)
 
@@ -307,7 +307,7 @@ console.log(buff_stim_pos)
 			stimulus: `
       <p> We will now first do some practice trials. </p>
       `,
-			choices: ["Click to continue"],
+			choices: ["繼續"],
       on_finish: function(data){
         blocknum = -1
         trialnum = 0
@@ -546,7 +546,7 @@ console.log(buff_stim_pos)
     var instruction_4 = {
       type: jsPsychHtmlButtonResponse,
       stimulus: "Ready to begin? The experiment will start on the next page.<br><br>",
-      choices: ["Start"],
+      choices: ["開始"],
       data: { screen: "instruction_4" },
       on_finish: function(data){
         blocknum = 0 
@@ -579,7 +579,7 @@ console.log(buff_stim_pos)
       data: { screen: "thankyou_page" },
 			stimulus: `
           <p>Thank you for your participation! Please click to finish. </p>`,
-			choices: ["Click to finish"]
+			choices: ["結束"]
 		}
     timeline.push(thankyou)
     
@@ -589,7 +589,7 @@ console.log(buff_stim_pos)
       data: {screen: "fullscreen_off"},
       on_finish: function(){
         //xxxxx console.log(jsPsych.data.get().filter({screen: 'stim'}).csv()); xxxxx//track    
-        jsPsych.data.get().filter({screen: 'stim'}).localSave('csv',idnum.toString()+'.csv')}
+        jsPsych.data.get().filter({screen: 'stim'}).localSave('csv',idnum.toString()+'_'+soa.toString()+'.csv')}
   } 
     timeline.push(fullscreen_off)
 
