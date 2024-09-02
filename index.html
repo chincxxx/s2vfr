@@ -16,7 +16,7 @@
     <script src="jsPsych-6.3.1/plugin-virtual-chinrest.js"></script>
     <script src="https://brain2ai.github.io/jsPsychSheet/jspsychsheet.js"></script> 
     <link rel="stylesheet" href="https://brain2ai.github.io/jsPsychSheet/jspsychsheet.css">
-    <meta http-equiv='content-Type' content='text/html; charset=UTF-8'/>
+    <meta http-equiv='content-Type' content='text/html; charset=utf-8'/>
 
     <style> 
       #topText {
@@ -118,8 +118,12 @@
     var C12= ["c12_1", "c12_2", "c12_3", "c12_4"]
 
     var buffer_list = ["a buffer1","a buffer2"]
-    var practice_list = ["你好c", "这里c", "可能b","无语c","好吃b","天啊c"]
+    var practice_pos_list = ["快樂_c", "喜悅_c", "可口_b",]
+    var practice_neg_list = ["傷心_b","惱人_c","生氣_c"]
+    var practice_list = [...practice_neg_list, ...practice_pos_list]
     var experiment_list= [...A1, ...A7]
+
+    
     console.log(buffer_list)
     console.log(practice_list)
     console.log(experiment_list)
@@ -128,7 +132,7 @@
 
     var timeline = []
     var n_blocks = 2; 
-    var n_trials = buffer_list.length+practice_list.length+experiment_list.length; //total num of trials
+    var n_trials = experiment_list.length; //total num of trials
     var trialnum = 0;
 		var blocknum = 0
     
@@ -212,10 +216,35 @@
         return "bottomCross";
       }
     })
-console.log(experiment_list)
-console.log(practice_positions_pre)
-console.log(buffer_positions_pre)
-console.log(experiment_positions_pre)
+    var prac_proposed_response
+    var prac_proposed_response = practice_list.map(item=>{
+      if (practice_neg_list.includes(item)){
+        return "negative";
+      } else if (practice_pos_list.includes(item)){
+        return "positive";
+      }
+    })
+  var prac_proposed_response_key = prac_proposed_response.map(item=>{
+    if (item === "negative"){
+      if (key_assignment === "posRight"){
+        return "a";
+      }else if (key_assignment === "posLeft"){
+        return "l";
+      }
+    } else if (item === "positive"){
+      if (key_assignment === "posRight"){
+        return "l";
+      }else if (key_assignment === "posLeft"){
+        return "a";
+      }
+    }
+  })
+//console.log(experiment_list)
+//console.log(practice_positions_pre)
+//console.log(buffer_positions_pre)
+//console.log(experiment_positions_pre)
+console.log()
+console.log(prac_proposed_response_key)
 
 var current_positions_pre
 
@@ -230,7 +259,9 @@ for (let i = 0; i < experiment_list.length; i++) {
       exp_stim_pos.push({ current_positions_pre: experiment_positions_pre[i], current_stimuli: experiment_list[i] , current_cross_positions_pre:exp_cross_positions_pre[i]});
 }
 for (let j = 0; j < practice_list.length; j++) {
-      prac_stim_pos.push({ current_positions_pre: practice_positions_pre[j], current_stimuli: practice_list[j] , current_cross_positions_pre:prac_cross_positions_pre[j]});
+      prac_stim_pos.push({ current_positions_pre: practice_positions_pre[j], 
+        current_stimuli: practice_list[j] , current_cross_positions_pre:prac_cross_positions_pre[j],
+        prac_proposed_response_key: prac_proposed_response_key[j]});
 }
 
 console.log(buff_stim_pos)
@@ -293,13 +324,17 @@ console.log(buff_stim_pos)
 
     var fixation = {
       type: jsPsychHtmlKeyboardResponse,
-      stimulus: `<div>+++</div>`,
+      stimulus: function(){
+        current_stimuli = jsPsych.timelineVariable("current_stimuli")
+        return(`<div>+++</div>`)
+      }`<div>+++</div>`,
       choices: "NO_KEYS",
       trial_duration: 500,
       on_finish: function(data){
         data.screen = "fixation"
         data.blocknum = blocknum // pass from instr_1: blocknum=-1
         data.trialnum = trialnum
+
       }
     }
 
@@ -339,6 +374,66 @@ console.log(buff_stim_pos)
     }
 
 
+//prac_proposed_response_key
+////////used for feedback for practice/////////////////////////////////////////////////////
+  var stim_prac = {
+    type: jsPsychHtmlKeyboardResponse,
+    stimulus: function(){
+        current_positions_pre = jsPsych.timelineVariable("current_positions_pre")
+        current_stimuli = jsPsych.timelineVariable("current_stimuli")
+        prac_proposed_response_key = jsPsych.timelineVariable("prac_proposed_response_key")
+        var full_stim = '<div id='+current_positions_pre+'>' + current_stimuli + '</div>';
+        console.log(prac_proposed_response_key)
+
+
+        if (experiment_list.includes(current_stimuli)){
+          trial_types = "experiment_trial"
+          trialnum += 1
+        }
+        else if (practice_list.includes(current_stimuli)){
+          trial_types = "practice_trial"
+        }
+        else if (buffer_list.includes(current_stimuli)){
+          trial_types = "buffer_trial"
+        }
+        return (full_stim)
+    }, 
+      choices: ["a", "l"],
+      trial_duration: 3000,
+      on_finish: function(data){
+        data.screen = "stim"
+        data.blocknum = blocknum 
+        
+        data.trialnum = trialnum
+        data.current_positions_pre = current_positions_pre
+        data.current_stimuli = current_stimuli
+        data.trial_types = trial_types
+        if(jsPsych.pluginAPI.compareKeys(data.response, prac_proposed_response_key)){
+        data.correct = true;
+    } else {
+      data.correct = false; 
+    }
+      }
+  }
+
+
+    var feedback_interval = {
+      type: jsPsychHtmlKeyboardResponse,
+      trial_duration: 1500,
+      stimulus: function(){
+    // The feedback stimulus is a dynamic parameter because we can't know in advance whether
+    // the stimulus should be 'correct' or 'incorrect'.
+    // Instead, this function will check the accuracy of the last response and use that information to set
+    // the stimulus value on each trial.
+    var last_trial_correct = jsPsych.data.get().last(1).values()[0].correct;
+    if(last_trial_correct){
+      return ""; // the parameter value has to be returned from the function
+    } else {
+      return `<p class="red-line"> Incorrect </p>`; // the parameter value has to be returned from the function
+    }
+  }
+  }
+
 
     var current_stimuli, stimuli_positions, full_stim
     var stim = {
@@ -347,11 +442,10 @@ console.log(buff_stim_pos)
         current_positions_pre = jsPsych.timelineVariable("current_positions_pre")
         current_stimuli = jsPsych.timelineVariable("current_stimuli")
         var full_stim = '<div id='+current_positions_pre+'>' + current_stimuli + '</div>';
-        console.log(full_stim)
-
 
         if (experiment_list.includes(current_stimuli)){
           trial_types = "experiment_trial"
+          trialnum += 1
         }
         else if (practice_list.includes(current_stimuli)){
           trial_types = "practice_trial"
@@ -370,6 +464,7 @@ console.log(buff_stim_pos)
         data.current_positions_pre = current_positions_pre
         data.current_stimuli = current_stimuli
         data.trial_types = trial_types
+       
       }
     }
 
@@ -393,14 +488,41 @@ console.log(buff_stim_pos)
         data.current_positions_pre = current_positions_pre
         data.current_stimuli = current_stimuli
         data.trial_types = trial_types
-        trialnum += 1
+        //trialnum += 1
       }
     }
+
+    var rest = {
+      type: jsPsychHtmlButtonResponse,
+      stimulus: '<p> Take a break. Press button to continue.',
+      choices: ['continue'],
+      response_ends_trial: true,
+      data: { screen: "rest"},
+      on_finish: function(){
+        //trialnum = 0
+        blocknum += 1; //after the break, blocknum = blocknum+ 1
+      }
+    }
+
+    //whether rest or not
+    var rest_if = {
+      timeline: [rest],
+      conditional_function: function(){
+
+        //if (1)trial is half way through/complete and (2)haven't rest yet
+        //which leaves only 'half way through'
+        if(((trialnum % (n_trials/2)) == 0) & (trialnum*(blocknum+1)!=n_trials*2)){
+            return true; //rest
+        } else {
+            return false; //no rest
+        }
+      }
+    };
     
     
 
     var practice_block = {
-      timeline: [fixation, position_fixation, blank_soa, stim, interval], 
+      timeline: [fixation, position_fixation, blank_soa, stim_prac, feedback_interval], 
       timeline_variables: prac_stim_pos, 
       randomize_order: true
     }
@@ -410,7 +532,7 @@ console.log(buff_stim_pos)
       randomize_order: true
     }
     var experiment_block = {
-      timeline: [fixation, position_fixation, blank_soa, stim, interval], 
+      timeline: [fixation, position_fixation, blank_soa, stim, interval, rest_if], 
       timeline_variables: exp_stim_pos, 
       randomize_order: true
     }
@@ -430,46 +552,22 @@ console.log(buff_stim_pos)
     };
     timeline.push(instruction_4)
 
-    //var rest = {
-      //type: "html-keyboard-response",
-      //stimulus: function(){
-
-        //where we are in the whole process
-        //var progress = Math.round(trialnum/n_trials*(blocknum+1)*100/n_blocks) //return whole number
-        //return ("You have completed " + progress + "% of the experiment.<br><br>" +
-              //"When you are ready, press <b>SPACEBAR</b> to continue.<br><br>")
-      //},
-      //choices: [' '], //space bar
-      //response_ends_trial: true,
-      //data: { screen: "break" },
-      //on_finish: function(){
-        //trialnum = 0
-        //blocknum += 1; //after the break, blocknum = blocknum+ 1
-      //}
-    //}
-
-    //whether rest or not
-    //var rest_if = {
-      //timeline: [rest], //include rest here, so we don't have to push rest to the bigger timeline
-      //conditional_function: function(){
-
-        //if (1)trial is half way through/complete and (2)haven't rest yet
-        //which leaves only 'half way through'
-        //if(((trialnum % (n_trials/2)) == 0) & (trialnum*(blocknum+1)!=n_trials*2)){
-            //return true; //rest
-        //} else {
-            //return false; //no rest
-        //}
-      //}
-    //};
     
     timeline.push(buffer_block)
-    timeline.push(experiment_block)
+
+
+
+
+
+
+
+
+  timeline.push(experiment_block)
     
     //var p
     //for (p = 0; p < n_blocks; p++) {
-      //timeline.push(experiment_block) //push this whole experiment 2 times (before rest & after rest)
-    //}
+      //timeline.push(experiment_block) 
+  //}
 
 
 
