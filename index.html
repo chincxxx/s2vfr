@@ -135,34 +135,69 @@
     var set1_text = jsPsych.data.getURLVariable('set1')
     var set2_text = jsPsych.data.getURLVariable('set2')
     
-    //var idnum = 3
-    //var soa = 200
-    //var set = "C"
-    //var set1_text = "C1"
-    //var set2_text = "C3"
+    /*var idnum = 3
+    var soa = 200
+    var set = "C"
+    var set1_text = "C1"
+    var set2_text = "C3"*/
 
-var buffer_list, practice_neg_list, practice_pos_list
+
+
+    function shuffleArray(array) {
+        for (var g = array.length - 1; g > 0; g--) {
+ 
+            // Generate random number 
+            var h = Math.floor(Math.random() * (g + 1));
+ 
+            var temp = array[g];
+            array[g] = array[h];
+            array[h] = temp;
+        }
+ 
+        return array;
+    }
+
+var buffer_list, practice_neg_list, practice_pos_list, raw_buffer_list, buffer_list_temp, buffer_list_break_1, buffer_list_break_2
 if (set === "A"){  // if the participant needs A_Set as stimuli
-  var buffer_list = ['發病','順利']
+  var raw_buffer_list = ['定罪','發病','順利','危險','玩樂','狂歡','昂貴','幽默','狂喜','侵害']
+  var buffer_list_temp = shuffleArray(raw_buffer_list)
+  var buffer_list = buffer_list_temp.slice(0, 2)
+  var buffer_list_break_1 = buffer_list_temp.slice(3,5)
+  var buffer_list_break_2 = buffer_list_temp.slice(6,8)
   var practice_pos_list = ['從容','立足','年假']
   var practice_neg_list = ['絕交','絕路','凶猛']
 } else if (set === "C"){ // if the participant needs C_Set as stimuli
-  var buffer_list = ['發病','順利']
+  var raw_buffer_list = ['中獎','犯人','中風','白痴','加油','好運','不朽','壯觀','內奸','反叛']
+  var buffer_list_temp = shuffleArray(raw_buffer_list)
+  var buffer_list = buffer_list_temp.slice(0, 2)
+  var buffer_list_break_1 = buffer_list_temp.slice(3,5)
+  var buffer_list_break_2 = buffer_list_temp.slice(6,8)
   var practice_pos_list = ['從容','立足','年假']
   var practice_neg_list = ['絕交','絕路','凶猛']
 } else if (set === "B"){  // if the participant needs B_Set as stimuli
-  var buffer_list = ['志士', '野狗']
+  var raw_buffer_list = ['中獎','犯人','中風','白痴','加油','好運','求救','身亡','充裕','民主']
+  var buffer_list_temp = shuffleArray(raw_buffer_list)
+  var buffer_list = buffer_list_temp.slice(0, 2)
+  var buffer_list_break_1 = buffer_list_temp.slice(3,5)
+  var buffer_list_break_2 = buffer_list_temp.slice(6,8)
   var practice_pos_list = ['吉祥','笑容','笑顏']
   var practice_neg_list = ['可憐', '遭受','懊悔']
 }
 
+//opt2: 1 pool of buffer words (equal split of neg/pos), every section randomly select 2 from 
 var set1, set2
 set1 = all_stimuli_lists[set1_text]
 set2 = all_stimuli_lists[set2_text]
 console.log(set1)
 console.log(set2)
     
+test_exp_1 = ['上映','干擾','切忌','天生']
+test_exp_2 = ['入賬','小孩','光棍','回家']
+    
 
+
+
+    //var experiment_list= [...test_exp_1, ...test_exp_2] ///needs revise
 
 
     var experiment_list= [...set1, ...set2] ///needs revise 
@@ -289,8 +324,12 @@ var i, j, k
 var exp_stim_pos = []
 var prac_stim_pos = []
 var buff_stim_pos = []
+var buff_break_stim_pos_1 = []
+var buff_break_stim_pos_2 = []
 for (let k = 0; k < buffer_list.length; k++) {
       buff_stim_pos.push({ current_positions_pre: buffer_positions_pre[k], current_stimuli: buffer_list[k], current_cross_positions_pre:buff_cross_positions_pre[k]});
+      buff_break_stim_pos_1.push({ current_positions_pre: buffer_positions_pre[k], current_stimuli: buffer_list_break_1[k], current_cross_positions_pre:buff_cross_positions_pre[k]});
+      buff_break_stim_pos_2.push({ current_positions_pre: buffer_positions_pre[k], current_stimuli: buffer_list_break_2[k], current_cross_positions_pre:buff_cross_positions_pre[k]})
     }
 for (let i = 0; i < experiment_list.length; i++) {
       exp_stim_pos.push({ current_positions_pre: experiment_positions_pre[i], current_stimuli: experiment_list[i] , current_cross_positions_pre:exp_cross_positions_pre[i]});
@@ -549,19 +588,49 @@ console.log(buff_stim_pos)
         blocknum += 1; //after the break, blocknum = blocknum+ 1
       }
     }
+    var buff_for_break_block_1 = {
+      timeline: [fixation, position_fixation, blank_soa, stim, interval], 
+      timeline_variables: buff_break_stim_pos_1, 
+      randomize_order: true
+    }
+    var buff_for_break_block_2 = {
+      timeline: [fixation, position_fixation, blank_soa, stim, interval], 
+      timeline_variables: buff_break_stim_pos_2, 
+      randomize_order: true
+    }
 
     //whether rest or not
-    var temporary, temporary_2
+    var temporary
     var rest_if = {
       timeline: [rest],
       conditional_function: function(){
         temporary = n_trials/3
-        if ((trialnum == Math.ceil(temporary)) || (trialnum == Math.ceil(temporary)*2)){
+        if ((trialnum == Math.ceil(temporary) )||((trialnum == Math.ceil(temporary)*2)) ){
+          return true
+        } else{
+          return false
+    }}}
+    var buff_if_1 = {
+      timeline: [buff_for_break_block_1],
+      conditional_function: function(){
+        temporary = n_trials/3
+        if (trialnum == Math.ceil(temporary)){
           return true
         } else{
           return false
         }
-
+    }}
+    var buff_if_2 = {
+      timeline: [buff_for_break_block_2],
+      conditional_function: function(){
+        temporary = n_trials/3
+        if (trialnum == Math.ceil(temporary)*2){
+          return true
+        } else{
+          return false
+        }
+    }}
+// || (trialnum == Math.ceil(temporary)*2)
         //if (1)trial is half way through/complete and (2)haven't rest yet
         //which leaves only 'half way through'
         //if(((trialnum % (n_trials/2)) == 0) & (trialnum*(blocknum+1)!=n_trials*2)){
@@ -569,8 +638,8 @@ console.log(buff_stim_pos)
         //} else {
             //return false; //no rest
         //}
-      }
-    };
+    
+  
     
     
 
@@ -585,7 +654,7 @@ console.log(buff_stim_pos)
       randomize_order: true
     }
     var experiment_block = {
-      timeline: [fixation, position_fixation, blank_soa, stim, interval, rest_if], 
+      timeline: [fixation, position_fixation, blank_soa, stim, interval, rest_if,buff_if_1,buff_if_2], 
       timeline_variables: exp_stim_pos, 
       randomize_order: true
     }
@@ -639,7 +708,7 @@ console.log(buff_stim_pos)
       data: {screen: "fullscreen_off"},
       on_finish: function(){
         //xxxxx console.log(jsPsych.data.get().filter({screen: 'stim'}).csv()); xxxxx//track    
-        jsPsych.data.get().filter({screen: 'stim'}).localSave('csv','set'+set+'_id'+idnum.toString()+'_'+soa.toString()+set1_text+set2_text+'.csv')}
+        jsPsych.data.get().filter({screen: 'stim'}).localSave('csv','set'+set+'_id'+idnum.toString()+'_'+soa.toString()+'_'+set1_text+set2_text+'.csv')}
   } 
     timeline.push(fullscreen_off)
 
