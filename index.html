@@ -130,7 +130,7 @@
     //INPUT from participants 
 
     var idnum = parseInt(jsPsych.data.getURLVariable('idnum'))
-    var soa = parseInt(jsPsych.data.getURLVariable('soa'))
+var soa = parseInt(jsPsych.data.getURLVariable('soa'))
     var set = jsPsych.data.getURLVariable('set')
     var set1_text = jsPsych.data.getURLVariable('set1')
     var set2_text = jsPsych.data.getURLVariable('set2')
@@ -533,7 +533,7 @@ console.log(buff_stim_pos)
         else if (practice_list.includes(current_stimuli)){
           trial_types = "practice_trial"
         }
-        else if (buffer_list.includes(current_stimuli)){
+        else if (raw_buffer_list.includes(current_stimuli)){
           trial_types = "buffer_trial"
         }
         return (full_stim)
