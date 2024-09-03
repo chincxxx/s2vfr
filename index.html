@@ -129,7 +129,7 @@
     
     var idnum = 3
     var soa = 200
-    var set = "A"
+    var set = "C"
 
 var buffer_list, practice_neg_list, practice_pos_list
 if (set === "A"){  // if the participant needs A_Set as stimuli
@@ -147,7 +147,11 @@ if (set === "A"){  // if the participant needs A_Set as stimuli
 }
 
     
-    var experiment_list= [...A1, ...A7] ///needs revise 
+var test_exp_1 = ['分開','心慌','出血','出醜']
+    var test_exp_2 = ['太空','父母','加分','平安']
+
+
+    var experiment_list= [...test_exp_1, ...test_exp_2] ///needs revise 
 
     var practice_list = [...practice_neg_list, ...practice_pos_list]
 
@@ -203,11 +207,12 @@ if (set === "A"){  // if the participant needs A_Set as stimuli
     }
 
     var target_positions_pre = ["topText", "bottomText"]
-    var experiment_positions_pre, buffer_positions_pre, practice_positions_pre
-    if (experiment_list.length % 2 === 0) {
+  
+    var experiment_positions_pre, buffer_positions_pre, practice_positions_pre, temporary
+    if (experiment_list.length % 2 === 0) { //if e.g., 8
       experiment_positions_pre = jsPsych.randomization.repeat(target_positions_pre, experiment_list.length/target_positions_pre.length);} 
-    else {
-      experiment_positions_pre = [...jsPsych.randomization.repeat(target_positions_pre, (experiment_list.length - 1)/target_positions_pre.length), ..."topText"]
+    else { //if e.g., 9
+      experiment_positions_pre = [...jsPsych.randomization.repeat(target_positions_pre, (experiment_list.length-1)/target_positions_pre.length),"topText"];
     }
     buffer_positions_pre = jsPsych.randomization.repeat(target_positions_pre, 1)
     practice_positions_pre = jsPsych.randomization.repeat(target_positions_pre, 3)
@@ -261,7 +266,7 @@ if (set === "A"){  // if the participant needs A_Set as stimuli
 //console.log(practice_positions_pre)
 //console.log(buffer_positions_pre)
 //console.log(experiment_positions_pre)
-console.log()
+console.log(experiment_positions_pre)
 console.log(prac_proposed_response_key)
 
 var current_positions_pre
@@ -292,10 +297,6 @@ console.log(buff_stim_pos)
 			stimulus: `
           <p>您好，歡迎來到這個實驗！！當您準備好開始實驗時，請按”繼續” 。</p>`,
 			choices: ["繼續"],
-      on_load: () => {
-        document.querySelector('button').disabled = true;
-        setTimeout(() => { document.querySelector('button').disabled = false}, 3000)
-      }
 		};
 		timeline.push(instruction_1);
 
@@ -470,7 +471,9 @@ console.log(buff_stim_pos)
           trial_types = "buffer_trial"
         }
         return (full_stim)
+        
     }, 
+
       choices: ["a", "l"],
       trial_duration: 3000,
       on_finish: function(data){
@@ -480,7 +483,7 @@ console.log(buff_stim_pos)
         data.current_positions_pre = current_positions_pre
         data.current_stimuli = current_stimuli
         data.trial_types = trial_types
-       
+        console.log(trialnum)
       }
     }
 
@@ -521,17 +524,24 @@ console.log(buff_stim_pos)
     }
 
     //whether rest or not
+    var temporary, temporary_2
     var rest_if = {
       timeline: [rest],
       conditional_function: function(){
+        temporary = n_trials/3
+        if ((trialnum == Math.ceil(temporary)) || (trialnum == Math.ceil(temporary)*2)){
+          return true
+        } else{
+          return false
+        }
 
         //if (1)trial is half way through/complete and (2)haven't rest yet
         //which leaves only 'half way through'
-        if(((trialnum % (n_trials/2)) == 0) & (trialnum*(blocknum+1)!=n_trials*2)){
-            return true; //rest
-        } else {
-            return false; //no rest
-        }
+        //if(((trialnum % (n_trials/2)) == 0) & (trialnum*(blocknum+1)!=n_trials*2)){
+            //return true; //rest
+        //} else {
+            //return false; //no rest
+        //}
       }
     };
     
