@@ -708,7 +708,7 @@ console.log(buff_stim_pos)
       data: {screen: "fullscreen_off"},
       on_finish: function(){
         //xxxxx console.log(jsPsych.data.get().filter({screen: 'stim'}).csv()); xxxxx//track    
-        jsPsych.data.get().filter({screen: 'stim'}).localSave('csv','set'+set+'_id'+idnum.toString()+'_'+soa.toString()+'_'+set1_text+set2_text+'.csv')}
+        jsPsych.data.get().filter({screen: 'stim'}).localSave('csv','s2v_set'+set+'_id'+idnum.toString()+'_'+soa.toString()+'_'+set1_text+set2_text+'.csv')}
   } 
     timeline.push(fullscreen_off)
 
