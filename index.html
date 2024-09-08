@@ -381,6 +381,8 @@ console.log(buff_stim_pos)
 		};
     timeline.push(instruction_2)
 
+	var direction = "s2v"
+
     var instruction_3 = {
       type: jsPsychHtmlButtonResponse,
       data: { screen: "instruction_3" },
@@ -394,7 +396,11 @@ console.log(buff_stim_pos)
         jsPsych.data.addProperties({
           idnum: idnum,
           soa: soa,
-          key_assignment: key_assignment
+          key_assignment: key_assignment,
+	  direction: direction,
+		set: set,
+		set1_text: set1_text,
+		set2_text: set2_text
         });
       }
 		};
