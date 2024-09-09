@@ -134,12 +134,14 @@ var soa = parseInt(jsPsych.data.getURLVariable('soa'))
     var set = jsPsych.data.getURLVariable('set')
     var set1_text = jsPsych.data.getURLVariable('set1')
     var set2_text = jsPsych.data.getURLVariable('set2')
+    var key_assignment = jsPsych.data.getURLVariable('key_assignment')
     
     /*var idnum = 3
     var soa = 200
     var set = "C"
     var set1_text = "C1"
-    var set2_text = "C3"*/
+    var set2_text = "C3"
+    var key_assignment = "posRight"*/
 
 
 
@@ -221,9 +223,8 @@ test_exp_2 = ['入賬','小孩','光棍','回家']
     
 
     var soa_duration = soa-150
-    var key_assignment, key_text
-    if (idnum % 2 === 0) {
-      key_assignment = "posRight";
+    var key_text
+    if (key_assignment = "posRight") {
       key_text = 
       `
       <p>在實驗裏，您會看到一連串的中文複合詞。
@@ -239,7 +240,6 @@ test_exp_2 = ['入賬','小孩','光棍','回家']
       <p><i><u><b>請在仔細閱讀以上說明然後繼續操作，
       並且確認您已經準備好！`} 
     else {
-      key_assignment = "posLeft";
       key_text = `
       <p>在實驗裏，您會看到一連串的中文複合詞。
       <p class="blue-line"><b>您的工作是對每一個複合詞判斷其表達的情感。
@@ -714,7 +714,7 @@ console.log(buff_stim_pos)
       data: {screen: "fullscreen_off"},
       on_finish: function(){
         //xxxxx console.log(jsPsych.data.get().filter({screen: 'stim'}).csv()); xxxxx//track    
-        jsPsych.data.get().filter({screen: 'stim'}).localSave('csv','s2v_set'+set+'_id'+idnum.toString()+'_'+soa.toString()+'_'+set1_text+set2_text+'.csv')}
+        jsPsych.data.get().filter({screen: 'stim'}).localSave('csv','s2v_set'+set+'_id'+idnum.toString()+'_'+soa.toString()+'_'+set1_text+set2_text+''key_'+key_assignment'.csv')}
   } 
     timeline.push(fullscreen_off)
 
