@@ -129,19 +129,19 @@
     }
     //INPUT from participants 
 
-    var idnum = parseInt(jsPsych.data.getURLVariable('idnum'))
+    /*var idnum = parseInt(jsPsych.data.getURLVariable('idnum'))
 var soa = parseInt(jsPsych.data.getURLVariable('soa'))
     var set = jsPsych.data.getURLVariable('set')
     var set1_text = jsPsych.data.getURLVariable('set1')
     var set2_text = jsPsych.data.getURLVariable('set2')
-    var key = jsPsych.data.getURLVariable('key')
+    var key = jsPsych.data.getURLVariable('key')*/
     
-    /*var idnum = 3
+    var idnum = 3
     var soa = 200
     var set = "C"
     var set1_text = "C1"
     var set2_text = "C3"
-    var key = "posLeft"*/
+    var key = "posLeft"
 
 
 
@@ -258,32 +258,45 @@ test_exp_2 = ['入賬','小孩','光棍','回家']
     }
 
     var target_positions_pre = ["topText", "bottomText"]
-  
     var experiment_positions_pre, buffer_positions_pre, practice_positions_pre, temporary
-    if (experiment_list.length % 2 === 0) { //if e.g., 8
+    /*if (experiment_list.length % 2 === 0) { //if e.g., 8
       experiment_positions_pre = jsPsych.randomization.repeat(target_positions_pre, experiment_list.length/target_positions_pre.length);} 
     else { //if e.g., 9
       experiment_positions_pre = [...jsPsych.randomization.repeat(target_positions_pre, (experiment_list.length-1)/target_positions_pre.length),"topText"];
     }
-    buffer_positions_pre = jsPsych.randomization.repeat(target_positions_pre, 1)
-    practice_positions_pre = jsPsych.randomization.repeat(target_positions_pre, 3)
-    var exp_cross_positions_pre, prac_cross_positions_pre, buff_cross_positions_pre
-    console.log(experiment_positions_pre)
-    var exp_cross_positions_pre = experiment_positions_pre.map(item=>{
+    console.log(experiment_positions_pre)*/
+
+    var experiment_positions_pre = experiment_list.map(item => {
+    if (set1.includes(item)) {
+        return "topText";
+    }
+    if (set2.includes(item)) {
+        return "bottomText";
+    }
+    return null; 
+});
+
+console.log(experiment_positions_pre)
+
+    buffer_positions_pre = jsPsych.randomization.repeat(target_positions_pre, 1) //no need to change
+    practice_positions_pre = jsPsych.randomization.repeat(target_positions_pre, 3) //no need to change
+    var exp_cross_positions_pre, prac_cross_positions_pre, buff_cross_positions_pre  //no need to change
+    
+    var exp_cross_positions_pre = experiment_positions_pre.map(item=>{ //no need to change
       if (item === "topText"){
         return "topCross";
       } else if (item === "bottomText"){
         return "bottomCross";
       }
     })
-    var buff_cross_positions_pre = buffer_positions_pre.map(item=>{
+    var buff_cross_positions_pre = buffer_positions_pre.map(item=>{ //no need to change
       if (item === "topText"){
         return "topCross";
       } else if (item === "bottomText"){
         return "bottomCross";
       }
     })
-    var prac_cross_positions_pre = practice_positions_pre.map(item=>{
+    var prac_cross_positions_pre = practice_positions_pre.map(item=>{ //no need to change
       if (item === "topText"){
         return "topCross";
       } else if (item === "bottomText"){
@@ -317,8 +330,7 @@ test_exp_2 = ['入賬','小孩','光棍','回家']
 //console.log(practice_positions_pre)
 //console.log(buffer_positions_pre)
 //console.log(experiment_positions_pre)
-console.log(experiment_positions_pre)
-console.log(prac_proposed_response_key)
+
 
 var current_positions_pre
 
@@ -333,7 +345,7 @@ for (let k = 0; k < buffer_list.length; k++) {
       buff_break_stim_pos_1.push({ current_positions_pre: buffer_positions_pre[k], current_stimuli: buffer_list_break_1[k], current_cross_positions_pre:buff_cross_positions_pre[k]});
       buff_break_stim_pos_2.push({ current_positions_pre: buffer_positions_pre[k], current_stimuli: buffer_list_break_2[k], current_cross_positions_pre:buff_cross_positions_pre[k]})
     }
-for (let i = 0; i < experiment_list.length; i++) {
+for (let i = 0; i < experiment_list.length; i++) { //here!!!
       exp_stim_pos.push({ current_positions_pre: experiment_positions_pre[i], current_stimuli: experiment_list[i] , current_cross_positions_pre:exp_cross_positions_pre[i]});
 }
 for (let j = 0; j < practice_list.length; j++) {
@@ -341,8 +353,6 @@ for (let j = 0; j < practice_list.length; j++) {
         current_stimuli: practice_list[j] , current_cross_positions_pre:prac_cross_positions_pre[j],
         prac_proposed_response_key: prac_proposed_response_key[j]});
 }
-
-console.log(buff_stim_pos)
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
